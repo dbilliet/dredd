@@ -1,6 +1,6 @@
 node_modules
 src-cov
-#/lib
+/lib
 cov.html
 .vagrant
 *.DS_Store
