@@ -168,17 +168,26 @@ class DreddCommand
       , waitMilis
 
   run: ->
-    for task in [
-      @setOptimistArgv
-      @setExitOrCallback
-      @parseCustomConfig
-      @runExitingActions
-      @loadDreddFile
-      @checkRequiredArgs
-      @moveBlueprintArgToPath
-    ]
-      task()
-      return if @finished
+    @setOptimistArgv()
+    return if @finished
+
+    @setExitOrCallback()
+    return if @finished
+
+    @parseCustomConfig()
+    return if @finished
+
+    @runExitingActions()
+    return if @finished
+
+    @loadDreddFile()
+    return if @finished
+
+    @checkRequiredArgs()
+    return if @finished
+
+    @moveBlueprintArgToPath()
+    return if @finished
 
     configurationForDredd = @initConfig()
     @dreddInstance = @initDredd configurationForDredd

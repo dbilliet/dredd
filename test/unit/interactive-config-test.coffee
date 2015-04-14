@@ -55,12 +55,12 @@ describe 'interactiveConfig', () ->
             done()
 
         it 'should have properties set from the config on proper places', () ->
-            assert.deepPropertyVal object, '_/0', 'apiary.apib'
-            assert.deepPropertyVal object, '_/1', 'http://localhost:3000'
-            assert.deepPropertyVal object, 'server', 'rails server'
-            assert.deepPropertyVal object, 'reporter', 'apiary'
-            assert.deepPropertyVal object, 'custom/apiaryApiKey', 'key'
-            assert.deepPropertyVal object, 'custom/apiaryApiName', 'name'
+          assert.equal object['_'][0], 'apiary.apib'
+          assert.equal object['_'][1], 'http://localhost:3000'
+          assert.equal object['server'], 'rails server'
+          assert.equal object['reporter'], 'apiary'
+          assert.equal object['custom']['apiaryApiKey'], 'key'
+          assert.equal object['custom']['apiaryApiName'], 'name'
 
     describe 'when apiary config passed from cli', () ->
       before () ->
