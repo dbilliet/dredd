@@ -138,58 +138,50 @@ class DreddCommand
     @argv.custom = configUtils.parseCustom @argv.custom
 
   runServerAndThenDredd: (callback) ->
-    if @argv['server']?
-
+    if not @argv['server']?
+      @runDredd @dreddInstance
+    else
       @serverProcess = exec @argv['server']
       console.log "Starting server with command: #{@argv['server']}"
+
+      @serverProcess.stdout.setEncoding 'utf8'
 
       @serverProcess.stdout.on 'data', (data) ->
         process.stdout.write data.toString()
 
+      @serverProcess.stderr.setEncoding 'utf8'
+
       @serverProcess.stderr.on 'data', (data) ->
         process.stdout.write data.toString()
 
-      @serverProcess.on 'error', (error) ->
+      @serverProcess.on 'error', (error) =>
         console.log error
         console.log "Server command failed, exitting..."
         @_processExit(2)
 
-      waitSecs = parseInt(@argv['server-wait'])
+      waitSecs = parseInt(@argv['server-wait'], 10)
       waitMilis = waitSecs * 1000
-      console.log "Wating #{waitSecs} seconds for backend server to start..."
+      console.log "Waiting #{waitSecs} seconds for server command to start..."
 
-      @wait = setTimeout () =>
+      @wait = setTimeout =>
         @runDredd @dreddInstance
       , waitMilis
 
-    else
-      @runDredd @dreddInstance
-
   run: ->
-    @setOptimistArgv()
-    return if @finished
-
-    @setExitOrCallback()
-    return if @finished
-
-    @parseCustomConfig()
-    return if @finished
-
-    @runExitingActions()
-    return if @finished
-
-    @loadDreddFile()
-    return if @finished
-
-    @checkRequiredArgs()
-    return if @finished
-
-    @moveBlueprintArgToPath()
-    return if @finished
+    for task in [
+      @setOptimistArgv
+      @setExitOrCallback
+      @parseCustomConfig
+      @runExitingActions
+      @loadDreddFile
+      @checkRequiredArgs
+      @moveBlueprintArgToPath
+    ]
+      task()
+      return if @finished
 
     configurationForDredd = @initConfig()
     @dreddInstance = @initDredd configurationForDredd
-
 
     try
       @runServerAndThenDredd()
@@ -197,7 +189,7 @@ class DreddCommand
       console.log e.message
       console.log e.stack
       @_processExit(2)
-
+    return
 
 
   lastArgvIsApiEndpoint: ->
